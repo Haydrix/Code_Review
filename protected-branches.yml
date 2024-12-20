@@ -1,0 +1,12 @@
+branches:
+  - name: main
+    required_approving_review_count: 1
+    restrictions:
+      users:
+        - username
+      teams:
+        - name-of-team
+    enforce_admins: true
+    required_status_checks:
+      contexts:
+        - "github/workflows/ci.yml"
