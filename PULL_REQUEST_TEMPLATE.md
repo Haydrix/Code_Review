@@ -24,6 +24,6 @@ Si applicable, ajoutez des captures d'écran pour aider à expliquer les changem
 **Liste de vérification**
 - [ ] Mon code suit le style de code de ce projet (ex : utilise Checkstyle).
 - [ ] J'ai mis à jour la documentation en conséquence.
-- [ ] J'ai lu le document [CONTRIBUTING.md].
+- [ ] J'ai lu le document [README.md].
 - [ ] J'ai ajouté des tests pour couvrir mes modifications.
 - [ ] Tous les tests ont passé.
