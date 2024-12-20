@@ -4,7 +4,7 @@ about: Fournir un modèle pour faciliter les contributions
 title: ''
 labels: ''
 reviewers:
-  - @username
+  - '@username'
 ---
 
 ## Description de vos modifications
