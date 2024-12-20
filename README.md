@@ -14,12 +14,12 @@ Prérequis
     Une connexion internet pour télécharger le fichier de centre de clusters par défaut.
 
 Utilisation
-Initialisation de l'instance
-AwesomePasswordChecker checker = AwesomePasswordChecker.getInstance();
-Vérification de la validité d'un mot de passe
-double distance = checker.getDistance("VotreMotDePasseIci");
-Calculer le hash MD5
-String md5Hash = AwesomePasswordChecker.computeMD5("VotreChaineIci");
+    Initialisation de l'instance
+    AwesomePasswordChecker checker = AwesomePasswordChecker.getInstance();
+    Vérification de la validité d'un mot de passe
+    double distance = checker.getDistance("VotreMotDePasseIci");
+    Calculer le hash MD5
+    String md5Hash = AwesomePasswordChecker.computeMD5("VotreChaineIci");
 
 Documentation additionnelle
 
