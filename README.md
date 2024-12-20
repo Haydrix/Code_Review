@@ -1,7 +1,9 @@
 AwesomePasswordChecker
+
 Description
 
-AwesomePasswordChecker est une application Java conçue pour vérifier la validité des mots de passe en utilisant des centres de clusters. Ce modèle utilise des caractéristiques spécifiques des caractères (majuscule, minuscule, chiffres, symboles) et calcule la distance Euclidienne par rapport à des centres de clusters pour évaluer la similarité avec des mots de passe précédemment validés.
+    AwesomePasswordChecker est une application Java conçue pour vérifier la validité des mots de passe en utilisant des centres de clusters. Ce modèle utilise des caractéristiques spécifiques des caractères (majuscule, minuscule, chiffres, symboles) et calcule la distance Euclidienne par rapport à des centres de clusters pour évaluer la similarité avec des mots de passe précédemment validés.
+
 Fonctionnalités
 
     Lecture des centres de clusters : La classe lit les centres de clusters à partir d'un fichier ou d'une ressource par défaut.
@@ -14,6 +16,7 @@ Prérequis
     Une connexion internet pour télécharger le fichier de centre de clusters par défaut.
 
 Utilisation
+
     Initialisation de l'instance
     AwesomePasswordChecker checker = AwesomePasswordChecker.getInstance();
     Vérification de la validité d'un mot de passe
