@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <!-- Suppress all outputs if there are no violations -->
+    <property name="severity" value="error" />
+
+    <!-- Ensure a newline at the end of the file -->
+    <module name="NewlineAtEndOfFile" />
+
+    <!-- Tree walker for specific rules -->
+    <module name="TreeWalker">
+        <!-- Enforce naming conventions -->
+        <module name="MethodName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
+        </module>
+        <module name="ClassName">
+            <property name="format" value="^[A-Z][a-zA-Z0-9]*$" />
+        </module>
+        <module name="ConstantName">
+            <property name="format" value="^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$" />
+        </module>
+        <module name="LocalVariableName">
+            <property name="format" value="^[a-z][a-zA-Z0-9]*$" />
+        </module>
+
+        <!-- Indentation rules -->
+        <module name="Indentation">
+            <property name="basicOffset" value="4" />
+            <property name="braceAdjustment" value="0" />
+            <property name="caseIndent" value="4" />
+            <property name="tabWidth" value="4" />
+        </module>
+
+        <!-- Ensure braces are used even for single-line blocks -->
+        <module name="NeedBraces" />
+
+        <!-- Avoid unused imports -->
+        <module name="UnusedImports" />
+
+        <!-- Line length limit -->
+        <module name="LineLength">
+            <property name="max" value="120" />
+            <property name="ignorePattern" value="^package.*|^import.*" />
+        </module>
+
+        <!-- Require Javadoc comments for classes, methods, and fields -->
+        <module name="JavadocType" />
+        <module name="JavadocMethod" />
+        <module name="JavadocVariable" />
+
+        <!-- Ensure whitespace is consistent -->
+        <module name="WhitespaceAround" />
+        <module name="NoWhitespaceAfter" />
+        <module name="NoWhitespaceBefore" />
+    </module>
+</module>
