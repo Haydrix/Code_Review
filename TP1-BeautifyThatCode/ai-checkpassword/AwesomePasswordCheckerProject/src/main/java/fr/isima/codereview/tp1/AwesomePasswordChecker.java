@@ -13,49 +13,85 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Classe pour vérifier la validité des mots de passe en utilisant des centres de clusters.
+ */
 public class AwesomePasswordChecker {
 
+  // Instance unique de AwesomePasswordChecker
   private static AwesomePasswordChecker instance;
 
+  // Liste de centres de clusters pour le calcul de la distance des mots de passe
   private final List<double[]> clusterCenters = new ArrayList<>();
 
-  public static AwesomePasswordChecker getInstance(File file) throws IOException {
+  /**
+   * Retourne l'instance unique de AwesomePasswordChecker en utilisant un fichier donné.
+   * @param file le fichier contenant les données de centre de clusters
+   * @return l'instance unique d'AwesomePasswordChecker
+   * @throws IOException si le fichier ne peut pas être lu
+   */
+  public static synchronized AwesomePasswordChecker getInstance(File file) throws IOException {
     if (instance == null) {
-          instance = new AwesomePasswordChecker(new FileInputStream(file));
+        instance = new AwesomePasswordChecker(new FileInputStream(file));
     }
     return instance;
   }
+
   
+  /**
+   * Retourne l'instance unique de AwesomePasswordChecker en utilisant une ressource par défaut.
+   * @return l'instance unique d'AwesomePasswordChecker
+   * @throws IOException si la ressource ne peut pas être lue
+   */
   public static AwesomePasswordChecker getInstance() throws IOException {
     if (instance == null) {
       InputStream is = AwesomePasswordChecker.class.getClassLoader().getResourceAsStream("cluster_centers_HAC_aff.csv");
       instance = new AwesomePasswordChecker(is);
     }
-      return instance;
-  }
-      
-  private AwesomePasswordChecker(InputStream is) throws IOException {
-    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-  String line;
-    while((line = br.readLine()) != null){
-      String[] values = line.split(";");
-      double[] center = new double[values.length];
-      
-      for (int i = 0; i < values.length; ++i) {
-        center[i] = Double.parseDouble(values[i]);
-      }
-      clusterCenters.add(center);
-    }
-    br.close();
+    return instance;
   }
 
+  private static final int expectedClusterSize = 28;
+
+  /**
+   * Constructeur privé qui initialise les centres de clusters à partir d'un flux d'entrée.
+   * @param is le flux d'entrée contenant les données des centres de clusters
+   * @throws IOException si une erreur survient lors de la lecture
+   */
+  public AwesomePasswordChecker(InputStream is) throws IOException {
+      try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+          String line;
+          while ((line = br.readLine()) != null) {
+              String[] values = line.split(";");
+              if (values.length != expectedClusterSize) {
+                  throw new IllegalArgumentException("Malformed line in cluster file: " + line);
+              }
+
+              double[] center = new double[values.length];
+              for (int i = 0; i < values.length; ++i) {
+                  try {
+                      center[i] = Double.parseDouble(values[i]);
+                  } catch (NumberFormatException e) {
+                      throw new IllegalArgumentException("Invalid number format in line: " + line, e);
+                  }
+              }
+              clusterCenters.add(center);
+          }
+      }
+  }
+
+
+  /**
+   * Génère un tableau de masque pour un mot de passe donné en fonction des propriétés des caractères.
+   * @param password le mot de passe d'entrée
+   * @return un tableau d'entiers représentant le masque des caractères
+   */
   public int[] maskAff(String password) {
-    int[] maskArray = new int[28]; 
-    int limit = Math.min(password.length(), 28);
+    final int[] maskArray = new int[28]; 
+    final int limit = Math.min(password.length(), 28);
     
     for (int i = 0; i < limit; ++i) {
-          char c = password.charAt(i);
+      char c = password.charAt(i);
       switch (c) {
         case 'e': 
         case 's':
@@ -67,7 +103,7 @@ public class AwesomePasswordChecker {
         case 'u':
         case 'o':
         case 'l':
-            maskArray[i] = 1;
+          maskArray[i] = 1;
           break;
         case 'E':
         case 'S':
@@ -108,15 +144,42 @@ public class AwesomePasswordChecker {
     return maskArray;
   }
 
-  public double getDIstance(String password) {
-    int[] maskArray = maskAff(password);
-    double minDistance = Double.MAX_VALUE;
-    for (double[] center : clusterCenters) {
-      minDistance = Math.min(euclideanDistance(maskArray, center), minDistance);
-    }
-    return minDistance;
+  /**
+   * Calcule la distance minimale entre le tableau de masque du mot de passe
+   * et les centres de clusters.
+   * @param password le mot de passe d'entrée
+   * @return la distance minimale par rapport à n'importe quel centre de cluster
+   */
+  public double getDistance(String password) {
+      if (password == null || password.isEmpty()) {
+          throw new IllegalArgumentException("Le mot de passe ne peut pas être nul ou vide");
+      }
+
+      int[] maskArray = maskAff(password);
+
+      if (maskArray == null || maskArray.length != 28) { // Vérifiez que le masque a la bonne taille
+          throw new IllegalStateException("Le tableau de masque est invalide ou de taille incorrecte");
+      }
+
+      double minDistance = Double.MAX_VALUE;
+
+      for (double[] center : clusterCenters) {
+          if (center.length != maskArray.length) {
+              throw new IllegalStateException("Dimension mismatch entre maskArray et les centres de cluster");
+          }
+          minDistance = Math.min(euclideanDistance(maskArray, center), minDistance);
+      }
+
+      return minDistance;
   }
 
+
+  /**
+   * Calcule la distance Euclidienne entre deux tableaux.
+   * @param a le tableau d'entiers (par exemple, masque du mot de passe)
+   * @param b le tableau de doubles (par exemple, centre de cluster)
+   * @return la distance Euclidienne entre les deux tableaux
+   */
   private double euclideanDistance(int[] a, double[] b) {
     double sum = 0;
     for (int i = 0; i < a.length; i++) {
@@ -125,7 +188,16 @@ public class AwesomePasswordChecker {
     return Math.sqrt(sum);
   }
 
-  public static String ComputeMD5(String input) {
+  /**
+   * Calcule le hash MD5 de la chaîne d'entrée donnée.
+   * @param input la chaîne d'entrée
+   * @return le hash MD5 en format hexadécimal
+   */
+public static String computeMD5(String input) {
+    if (input == null) {
+        throw new IllegalArgumentException("Input cannot be null");
+    }
+
     byte[] message = input.getBytes();
     int messageLenBytes = message.length;
 
@@ -207,7 +279,7 @@ public class AwesomePasswordChecker {
       h[3] += d;
     }
 
-    // Step 5: Output
+    // Stocker le résultat MD5 dans un buffer
     ByteBuffer md5Buffer = ByteBuffer.allocate(16).order(ByteOrder.LITTLE_ENDIAN);
     md5Buffer.putInt(h[0]).putInt(h[1]).putInt(h[2]).putInt(h[3]);
     byte[] md5Bytes = md5Buffer.array();
@@ -220,7 +292,9 @@ public class AwesomePasswordChecker {
     return md5Hex.toString();
   }
 
-  public static void main(String[] args){
-  
+
+
+  public static void main(String[] args) {
+    // Point d'entrée principal de l'application
   }
 }
